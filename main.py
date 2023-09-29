@@ -6,8 +6,11 @@ import models
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import auth
 
 app = FastAPI()
+app.include_router(auth.router)
+
 # Dependency
 
 # CORS POLICY
