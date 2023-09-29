@@ -38,13 +38,14 @@ def get_db():
         db.close()
         
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict, Depends(auth.get_current_user)]
 
 class User(BaseModel):
 	email: str
 
 @app.get("/", status_code=status.HTTP_200_OK)
-def user(user: None, db: db_dependency):
+def user(user: user_dependency, db: db_dependency):
     if User is None:
          raise HTTPException(status_code=401, detail="Authentication failed")
     
-    return {"User": user}
+    return {"user": user}
