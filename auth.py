@@ -82,7 +82,8 @@ def authenticate_user(email: str, password: str, db: db_dependency):
     return user
 
 def create_access_token(email: str, user_id: int, expires_delta: timedelta):
-    encode = {"sub": email, "id": user_id}
+    # modify project's custom claims here.
+    encode = {"email": email, "id": user_id}
     expires = (datetime.utcnow() + expires_delta).isoformat()
     encode.update({"exp": expires})
 
