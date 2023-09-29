@@ -47,7 +47,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 def create_user(db: db_dependency, create_user_request: CreateUserRequest):
     create_user_model = models.User(
         email=create_user_request.email,
-        hashed_password=bcrypt_context.hash(create_user_request.password)
+        hashed_password=get_password_hash(password=create_user_request.password)
     )
       
     db.add(create_user_model)
@@ -66,11 +66,17 @@ def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
 
     return {"access_token": token, "token_type": "bearer"}
 
+def verify_password(plain_password: str, hashed_password: str):
+    return bcrypt_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password: str):
+    return bcrypt_context.hash(password)
+
 def authenticate_user(email: str, password: str, db: db_dependency):
     user: models.User = db.query(models.User).filter(models.User.email == email).first()
     if not user:
         return False
-    if not bcrypt_context.verify(password, user.hashed_password):
+    if not verify_password(plain_password=password, hashed_password=user.hashed_password):
         return False
     
     return user
