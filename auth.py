@@ -32,7 +32,8 @@ class CreateUserRequest(BaseModel):
 
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    refresh_token: str
+    token_type: str = "Bearer"
 
 def get_db():
     db = SessionLocal()
@@ -62,9 +63,10 @@ def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depen
     user = authenticate_user(email=form_data.username, password=form_data.password, db=db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
-    token = create_access_token(email=user.email, user_id=user.id, expires_delta=timedelta(minutes=20))
-
-    return {"access_token": token, "token_type": "bearer"}
+    access_token = create_access_token(email=user.email, user_id=user.id, expires_delta=timedelta(minutes=20))
+    refresh_token = create_refresh_token(data={"email": user.email, "id": user.id})
+        
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 def verify_password(plain_password: str, hashed_password: str):
     return bcrypt_context.verify(plain_password, hashed_password)
@@ -83,12 +85,15 @@ def authenticate_user(email: str, password: str, db: db_dependency):
 
 def create_access_token(email: str, user_id: int, expires_delta: timedelta):
     # modify project's custom claims here.
-    encode = {"email": email, "id": user_id}
+    payload = {"email": email, "id": user_id}
     expires = datetime.utcnow() + expires_delta
     expire_timestamp = int(expires.timestamp())
-    encode.update({"exp": expire_timestamp})
+    payload.update({"exp": expire_timestamp})
 
-    return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+def create_refresh_token(data):
+    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
    
 def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     credential_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials.", headers={"WWW-Authenticate": "Bearer"})
