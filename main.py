@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 import models
 from database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 # Dependency
@@ -35,7 +36,12 @@ def get_db():
         
 db_dependency = Annotated[Session, Depends(get_db)]
 
+class User(BaseModel):
+	email: str
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+@app.get("/", status_code=status.HTTP_200_OK)
+def user(user: None, db: db_dependency):
+    if User is None:
+         raise HTTPException(status_code=401, detail="Authentication failed")
+    
+    return {"User": user}
