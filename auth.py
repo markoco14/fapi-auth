@@ -84,8 +84,9 @@ def authenticate_user(email: str, password: str, db: db_dependency):
 def create_access_token(email: str, user_id: int, expires_delta: timedelta):
     # modify project's custom claims here.
     encode = {"email": email, "id": user_id}
-    expires = (datetime.utcnow() + expires_delta).isoformat()
-    encode.update({"exp": expires})
+    expires = datetime.utcnow() + expires_delta
+    expire_timestamp = int(expires.timestamp())
+    encode.update({"exp": expire_timestamp})
 
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
    
