@@ -3,7 +3,7 @@ from typing import Annotated, Union, List
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 import models
-from database import SessionLocal, engine
+from core.database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import auth
