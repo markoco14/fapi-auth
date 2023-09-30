@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt
+from jose import JWTError, jwt
 
 from core.config import get_settings
 
@@ -25,3 +25,10 @@ def create_access_token(data, expiry: timedelta):
 def create_refresh_token(data):
 	# Can add JWT_REFRESH_SECRET
 	return jwt.encode(data, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+def get_token_payload(token: str):
+	try:
+		payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+	except JWTError:
+		return None
+	return payload

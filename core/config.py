@@ -22,6 +22,7 @@ class Settings(BaseSettings):
 	JWT_SECRET: str = os.environ.get('JWT_SECRET')
 	JWT_ALGORITHM: str = os.environ.get('JWT_ALGORITHM')
 	ACCESS_TOKEN_EXPIRE_MINUTES: int = os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES')
+	# TODO: REFRESH_TOKEN_EXPIRE_MINUTES
 
 """
 	can I declare this within the class?
