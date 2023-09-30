@@ -19,8 +19,8 @@ router = APIRouter(
     tags=['auth']
 )
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
-ALGORITHM = os.environ.get('ALGORITHM')
+JWT_SECRET = os.environ.get('JWT_SECRET')
+JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -90,15 +90,15 @@ def create_access_token(email: str, user_id: int, expires_delta: timedelta):
     expire_timestamp = int(expires.timestamp())
     payload.update({"exp": expire_timestamp})
 
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 def create_refresh_token(data):
-    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(data, JWT_SECRET, algorithm=JWT_ALGORITHM)
    
 def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     credential_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials.", headers={"WWW-Authenticate": "Bearer"})
     try:
-        payload = jwt.decode(token=token, key=SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token=token, key=JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_email: str = payload.get("sub")
         user_id: int = payload.get("id")
         if user_email is None or user_id is None:

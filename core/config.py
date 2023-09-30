@@ -18,6 +18,11 @@ class Settings(BaseSettings):
 	DB_NAME: str = os.environ.get('DB_NAME')
 	DATABASE_URL: str = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
+	# JWT
+	JWT_SECRET = os.environ.get('JWT_SECRET')
+	JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM')
+	ACCESS_TOKEN_EXPIRE_MINUTES = os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES')
+
 """
 	can I declare this within the class?
 	but I would have to create a new instance wherever I want to use it?
