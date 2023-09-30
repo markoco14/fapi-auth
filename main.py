@@ -3,8 +3,9 @@ from typing import Annotated, Union, List
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 import users.models as models
-
+from core.security import JWTAuth
 from auth.routes import router as auth_router
+from starlette.middleware.authentication import AuthenticationMiddleware
 
 from users.routes import router as user_router
 from core.database import SessionLocal, engine
@@ -16,6 +17,9 @@ app = FastAPI()
 # app.include_router(auth.router)
 app.include_router(user_router)
 app.include_router(auth_router)
+
+# Add Middleware
+app.add_middleware(AuthenticationMiddleware, backend=JWTAuth())
 
 # Dependency
 
