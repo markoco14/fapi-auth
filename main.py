@@ -4,6 +4,8 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 import users.models as models
 
+from auth.routes import router as auth_router
+
 from users.routes import router as user_router
 from core.database import SessionLocal, engine
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,8 +13,9 @@ from pydantic import BaseModel
 import auth
 
 app = FastAPI()
-app.include_router(auth.router)
+# app.include_router(auth.router)
 app.include_router(user_router)
+app.include_router(auth_router)
 
 # Dependency
 
@@ -41,14 +44,14 @@ def get_db():
         db.close()
         
 db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(auth.get_current_user)]
+# user_dependency = Annotated[dict, Depends(auth.get_current_user)]
 
 class User(BaseModel):
 	email: str
 
-@app.get("/", status_code=status.HTTP_200_OK)
-def user(user: user_dependency, db: db_dependency):
-    if User is None:
-         raise HTTPException(status_code=401, detail="Authentication failed")
+# @app.get("/", status_code=status.HTTP_200_OK)
+# def user(user: user_dependency, db: db_dependency):
+#     if User is None:
+#          raise HTTPException(status_code=401, detail="Authentication failed")
     
-    return {"user": user}
+#     return {"user": user}
