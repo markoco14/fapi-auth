@@ -8,7 +8,7 @@ from alembic import context
 settings = get_settings()
 
 from core.database import Base
-from users.models import User
+from users.models import UserModel
 
 
 # this is the Alembic Config object, which provides
@@ -47,7 +47,7 @@ def run_migrations_offline() -> None:
     """
     # config.set_main_option('sqlalchemy.url', DATABASE_URL)
     # url = config.get_main_option("sqlalchemy.url")
-    url = DATABASE_URL
+    url = settings.DATABASE_URL
     context.configure(
         url=url,
         target_metadata=target_metadata,
