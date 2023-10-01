@@ -15,7 +15,7 @@ def get_token(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_depe
 
 	if not user:
 		raise HTTPException(
-			status=status.HTTP_400_BAD_REQUEST, 
+			status_code=status.HTTP_400_BAD_REQUEST, 
 			detail="User not found",
 			headers={"WWW-Authenticate": "Bearer"}
 			)
@@ -27,27 +27,37 @@ def get_token(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_depe
 			headers={"WWW-Authenticate": "Bearer"}
 		)
 	
-	_verify_user_access(user=user)
+	check_user_active(user=user)
+
+	check_user_verified(user=user)
 
 	return _get_user_token(user=user)
 	
-
-def _verify_user_access(user: UserModel):
+	
+def check_user_active(user: UserModel):
 	if not user.is_active:
 		raise HTTPException(
-			status=status.HTTP_400_BAD_REQUEST, 
+			status_code=status.HTTP_400_BAD_REQUEST, 
 			detail="Your account is inactive. Please contact support.",
 			headers={"WWW-Authenticate": "Bearer"}
 			)
 	
-	# I want to let unverified accounts have some access
-	# if not user.is_verified:
-	# 	Trigger user account verification email
-	# 	raise HTTPException(
-	# 		status=status.HTTP_400_BAD_REQUEST, 
-	# 		detail="Your account is not verified. We have resent the account verification email.",
-	# 		headers={"WWW-Authenticate": "Bearer"}
-	# 		)
+"""
+let user be unverified for 30 days
+"""
+def check_user_verified(user: UserModel):
+	within_thirty_days = datetime.now() - timedelta(days=30)
+	if not user.is_verified and user.created_at >= within_thirty_days:
+		return True
+	
+	if not user.is_verified:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST, 
+			detail="Your account is not verified. We have resent the account verification email.",
+			headers={"WWW-Authenticate": "Bearer"}
+			)
+	
+
 	
 	
 def _get_user_token(user: UserModel, refresh_token: str = None):
