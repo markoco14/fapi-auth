@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, Text, Integer, Boolean, DateTime, func
 from core.database import Base
 
 class UserModel(Base):
-	__tablename__ = 'users'
+	__tablename__ = 'fast_demo_users'
 
 	id = Column(Integer, primary_key=True, index=True)
 	first_name = Column(String(100))
