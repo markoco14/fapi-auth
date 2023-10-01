@@ -31,7 +31,7 @@ def get_token(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_depe
 
 	check_user_verified(user=user)
 
-	return _get_user_token(user=user)
+	return create_user_token(user=user)
 	
 	
 def check_user_active(user: UserModel):
@@ -60,7 +60,7 @@ def check_user_verified(user: UserModel):
 
 	
 	
-def _get_user_token(user: UserModel, refresh_token: str = None):
+def create_user_token(user: UserModel, refresh_token: str = None):
 	payload = {"id": user.id }
 
 	access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -76,7 +76,7 @@ def _get_user_token(user: UserModel, refresh_token: str = None):
 	)
 
 
-def get_refresh_token(token: str, db: db_dependency):
+def refresh_user_token(token: str, db: db_dependency):
 	payload = get_token_payload(token=token)
 	user_id = payload.get("id", None)
 	if not user_id:
@@ -93,7 +93,7 @@ def get_refresh_token(token: str, db: db_dependency):
 			detail="Invalid refresh token",
 			headers={"WWW-Authenticate": "Bearer"}
 		)
-	return _get_user_token(user=user, refresh_token=token)
+	return create_user_token(user=user, refresh_token=token)
 
 
 	
