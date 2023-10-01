@@ -18,3 +18,5 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
+
+# db_dependency = Annotated[Session, Depends(get_db)]
