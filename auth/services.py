@@ -40,15 +40,6 @@ def _verify_user_access(user: UserModel):
 			headers={"WWW-Authenticate": "Bearer"}
 			)
 	
-def _get_user_token(user: UserModel, refresh_token: str = None):
-	payload = {"id": user.id }
-
-	access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-
-	access_token = create_access_token(data=payload, expiry=access_token_expiry)
-	if not refresh_token:
-		refresh_token = create_refresh_token(data=payload)
-
 	# I want to let unverified accounts have some access
 	# if not user.is_verified:
 	# 	Trigger user account verification email
@@ -58,6 +49,15 @@ def _get_user_token(user: UserModel, refresh_token: str = None):
 	# 		headers={"WWW-Authenticate": "Bearer"}
 	# 		)
 	
+	
+def _get_user_token(user: UserModel, refresh_token: str = None):
+	payload = {"id": user.id }
+
+	access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+	access_token = create_access_token(data=payload, expiry=access_token_expiry)
+	if not refresh_token:
+		refresh_token = create_refresh_token(data=payload)
 
 	return TokenResponse(
 		access_token=access_token,
