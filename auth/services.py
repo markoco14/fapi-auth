@@ -76,8 +76,10 @@ def create_user_token(user: UserModel, refresh_token: str = None):
 	)
 
 
-def refresh_user_token(token: str, db: db_dependency):
-	payload = get_token_payload(token=token)
+def refresh_user_token(refresh_token: str, db: db_dependency):
+
+	
+	payload = get_token_payload(token=refresh_token)
 	user_id = payload.get("id", None)
 	if not user_id:
 		raise HTTPException(
@@ -93,7 +95,31 @@ def refresh_user_token(token: str, db: db_dependency):
 			detail="Invalid refresh token",
 			headers={"WWW-Authenticate": "Bearer"}
 		)
-	return create_user_token(user=user, refresh_token=token)
+	
+	# CHECK IF REFRESH TOKEN HAS EXP
+	# NEEDS RE-ROUTE
+	# AND LOG USER OUT
+	token_expiry_timestamp = payload.get("exp", None)
+	if not token_expiry_timestamp:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Invalid refresh token",
+			headers={"WWW-Authenticate": "Bearer"}
+		)
+	
+	# CHECK IF REFRESH TOKEN EXPIRED
+	# NEEDS RE-ROUTE
+	# AND LOG USER OUT
+	current_date = datetime.now()
+	token_expiry_date = datetime.utcfromtimestamp(token_expiry_timestamp)
+	if token_expiry_date < current_date:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="Refresh token expired",
+			headers={"WWW-Authenticate": "Bearer"}
+		)
+	
+	return create_user_token(user=user, refresh_token=refresh_token)
 
 
 	

@@ -46,8 +46,8 @@ def get_token_payload(token: str):
 		return None
 	return payload
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Annotated[Session, Depends(get_db)] = None):
-	payload = get_token_payload(token=token)
+def get_current_user(access_token: Annotated[str, Depends(oauth2_scheme)], db: Annotated[Session, Depends(get_db)] = None):
+	payload = get_token_payload(token=access_token)
 	if not payload or type(payload) is not dict:
 		return None
 	
@@ -71,11 +71,11 @@ class JWTAuth:
 		if 'authorization' not in request.headers:
 			return guest
 		
-		token = request.headers.get("authorization").split(" ")[1] # Bearer token_hash
-		if not token:
+		access_token = request.headers.get("authorization").split(" ")[1] # Bearer token_hash
+		if not access_token:
 			return guest
 		
-		user = get_current_user(token=token)
+		user = get_current_user(access_token=access_token)
 
 		if not user:
 			return guest

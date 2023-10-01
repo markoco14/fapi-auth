@@ -17,4 +17,4 @@ def login(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[S
 
 @router.post("/refresh", status_code=status.HTTP_200_OK)
 def refresh_access_token(refresh_token: Annotated[str, Header()], db: Annotated[Session, Depends(get_db)]):
-	return refresh_user_token(token=refresh_token, db=db)
+	return refresh_user_token(refresh_token=refresh_token, db=db)
