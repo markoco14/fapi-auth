@@ -1,16 +1,16 @@
+from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from auth.responses import TokenResponse
 from core.config import get_settings
-from core.database import SessionLocal, get_db
+from core.database import db_dependency
 from core.security import get_token_payload, verify_password, create_access_token, create_refresh_token
 from users.models import UserModel
 from datetime import timedelta, datetime
-from sqlalchemy.orm import Session
 
 settings = get_settings()
 
-def get_token(data: OAuth2PasswordRequestForm = Depends(), db: SessionLocal = Depends(get_db)):
+def get_token(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
 	user = db.query(UserModel).filter(UserModel.email == data.username).first()
 
 	if not user:
@@ -66,7 +66,7 @@ def _get_user_token(user: UserModel, refresh_token: str = None):
 	)
 
 
-def get_refresh_token(token: str, db: Session = Depends(get_db)):
+def get_refresh_token(token: str, db: db_dependency):
 	payload = get_token_payload(token=token)
 	user_id = payload.get("id", None)
 	if not user_id:

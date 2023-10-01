@@ -1,7 +1,8 @@
-from typing import Generator
+from typing import Annotated, Generator
+from fastapi import Depends
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from core import config
 
 settings = config.get_settings()
@@ -19,4 +20,4 @@ def get_db() -> Generator:
     finally:
         db.close()
 
-# db_dependency = Annotated[Session, Depends(get_db)]
+db_dependency = Annotated[Session, Depends(get_db)]
