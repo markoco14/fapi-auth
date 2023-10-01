@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 @router.post("/token", status_code=status.HTTP_200_OK)
-def authenticate_user(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[Session, Depends(get_db)]):
+def login(data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[Session, Depends(get_db)]):
 	return get_token(data=data, db=db)
 
 @router.post("/refresh", status_code=status.HTTP_200_OK)
