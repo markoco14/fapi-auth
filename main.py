@@ -1,17 +1,22 @@
-from fastapi import Depends, FastAPI, HTTPException, status
-from typing import Annotated, Union, List
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
-import models
-from database import SessionLocal, engine
+from fastapi import FastAPI
+from core.security import JWTAuth
+from auth.routes import router as auth_router
+from starlette.middleware.authentication import AuthenticationMiddleware
+from users.routes import router as guest_router, user_router
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import auth
+
+
+
 
 app = FastAPI()
-app.include_router(auth.router)
+app.include_router(guest_router)
+app.include_router(user_router)
+app.include_router(auth_router)
 
-# Dependency
+
+# Add Middleware
+app.add_middleware(AuthenticationMiddleware, backend=JWTAuth())
+
 
 # CORS POLICY
 origins = [
@@ -29,23 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def health_check():
+	return {"status": "healthy"}       
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-        
-db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(auth.get_current_user)]
-
-class User(BaseModel):
-	email: str
-
-@app.get("/", status_code=status.HTTP_200_OK)
-def user(user: user_dependency, db: db_dependency):
-    if User is None:
-         raise HTTPException(status_code=401, detail="Authentication failed")
-    
-    return {"user": user}
