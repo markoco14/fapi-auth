@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-from core.security import JWTAuth
-from auth.routes import router as auth_router
-from starlette.middleware.authentication import AuthenticationMiddleware
-from users.routes import router as guest_router, user_router
 from fastapi.middleware.cors import CORSMiddleware
+
+from auth.routes import router as auth_router
 from core.config import get_settings
+from users.routes import router as guest_router, user_router
 
 settings = get_settings()
 
@@ -14,20 +13,18 @@ app.include_router(user_router)
 app.include_router(auth_router)
 
 
-# Add Middleware
-app.add_middleware(AuthenticationMiddleware, backend=JWTAuth())
 
 if settings.ENVIRONMENT == 'prod':
-	origins = [
-		f"{settings.NEXT_DEMO_URL}",
-	]
+    origins = [
+        f"{settings.NEXT_DEMO_URL}",
+    ]
 else :
-	origins = [
-		"http://localhost",
-		"http://localhost:3000",
-		"http://127.0.0.1"
-		"http://127.0.0.1:3000",
-	]
+    origins = [
+        "http://localhost",
+        "http://localhost:3000",
+        "http://127.0.0.1"
+        "http://127.0.0.1:3000",
+    ]
 
 # CORS POLICY
 
@@ -41,5 +38,4 @@ app.add_middleware(
 
 @app.get("/")
 def health_check():
-	return {"status": "healthy"}       
-
+    return {"status": "healthy"}
