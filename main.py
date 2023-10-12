@@ -16,7 +16,7 @@ app.include_router(auth_router)
 
 if settings.ENVIRONMENT == 'prod':
     origins = [
-        f"{settings.NEXT_DEMO_URL}",
+        f"{settings.CLIENT_URL}",
     ]
 else :
     origins = [

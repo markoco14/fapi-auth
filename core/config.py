@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     DB_NAME: str = os.environ.get('DB_NAME')
 
     ENVIRONMENT: str = os.environ.get('ENVIRONMENT')
-    NEXT_DEMO_URL: str = os.environ.get('NEXT_DEMO_URL')
+    CLIENT_URL: str = os.environ.get('CLIENT_URL')
 
     if ENVIRONMENT == 'dev':
         DATABASE_URL: str = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
