@@ -20,11 +20,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = os.environ.get('ENVIRONMENT')
     CLIENT_URL: str = os.environ.get('CLIENT_URL')
 
-    if ENVIRONMENT == 'dev':
-        DATABASE_URL: str = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    else:
-        MYSQL_ATTR_SSL_CA: str = os.environ.get('MYSQL_ATTR_SSL_CA')
-        DATABASE_URL: str = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?ssl_ca={MYSQL_ATTR_SSL_CA}"
+
+    DATABASE_URL: str = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     # JWT
     JWT_SECRET: str = os.environ.get('JWT_SECRET')
